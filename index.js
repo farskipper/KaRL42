@@ -43,6 +43,26 @@ var gen = {
   }
 };
 
+var isParenRule = function(rule){
+  if(_.size(rule && rule.symbols) !== 5){
+    return false;
+  }
+  var s = rule.symbols;
+  if(!s[0] || s[0].literal !== "("){
+    return false;
+  }
+  if(s[1] !== "_"){
+    return false;
+  }
+  if(s[3] !== "_"){
+    return false;
+  }
+  if(!s[4] || s[4].literal !== ")"){
+    return false;
+  }
+  return true;
+};
+
 module.exports = function(start){
   var stack = [start || grammar.ParserStart];
   var output = '';
@@ -55,12 +75,15 @@ module.exports = function(start){
     if(rules.length === 0){
       throw new Error("Nothing matches rule: "+currentname+"!");
     }
-    if(stop_recusive_rules || stack.length > 25){
-      rules = _.filter(rules, function(rule){
+    return _.sample(_.filter(rules, function(rule){
+      if(isParenRule(rule)){
+        return false;
+      }
+      if(stop_recusive_rules || stack.length > 25){
         return !_.includes(rule.symbols, currentname);
-      });
-    }
-    return _.sample(rules);
+      }
+      return true;
+    }));
   };
 
   var count = 0;
