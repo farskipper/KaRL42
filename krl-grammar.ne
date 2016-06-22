@@ -401,9 +401,8 @@ Declaration -> left_side_of_declaration _ "=" _ Expression {%
 # Later we may add destructuring
 left_side_of_declaration -> Identifier {% id %}
 
-Statement_list -> null {% noopArr %}
-    | Statement {% idArr %}
-    | Statement_list _ ";" _ Statement {% concatArr(4) %}
+Statement_list -> Statement
+    | Statement_list _ ";" _ Statement
 
 declaration_block -> "{" _ "}" {% noopArr %}
     | "{" _ declaration_list _ "}" {% getN(2) %}

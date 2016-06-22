@@ -30,38 +30,42 @@ var gen = {
 
 module.exports = function(){
   var stack = [grammar.ParserStart];
-  var rules = grammar.ParserRules;
-
   var output = '';
+  var stop_recusive_rules = false;
+
+  var selectRule = function(currentname){
+    var rules = grammar.ParserRules.filter(function(x) {
+      return x.name === currentname;
+    });
+    if(rules.length === 0){
+      throw new Error("Nothing matches rule: "+currentname+"!");
+    }
+    if(stop_recusive_rules){
+      rules = _.filter(rules, function(rule){
+        return !_.includes(rule.symbols, currentname);
+      });
+    }
+    return _.sample(rules);
+  };
+
+  var count = 0;
 
   while(stack.length > 0){
-    var currentname = stack.pop();
-    if(gen[currentname]){
-      output += gen[currentname]();
-      continue;
+    count++;
+    if(!stop_recusive_rules && count > 200){
+      stop_recusive_rules = true;
     }
-    if(typeof(currentname) === 'string'){
-      var goodrules = grammar.ParserRules.filter(function(x) {
-        return x.name === currentname;
+    var currentname = stack.pop();
+    if(typeof currentname === 'string'){
+      _.each(selectRule(currentname).symbols, function(symbol){
+        stack.push(symbol);
       });
-      if(goodrules.length > 0){
-        var chosen = goodrules[
-          Math.floor(Math.random()*goodrules.length)
-        ];
-        for(var i=chosen.symbols.length-1; i>=0; i--){
-          stack.push(chosen.symbols[i]);
-        }
-      }else{
-        throw new Error("Nothing matches rule: "+currentname+"!");
-      }
+    }else if(gen[currentname]){
+      stack.push({literal: gen[currentname]()});
     }else if(currentname.test){
-      var c = new randexp(currentname).gen();
-      output += c;
-      continue;
+      output += new randexp(currentname).gen();
     }else if(currentname.literal){
-      var c = currentname.literal;
-      output += c;
-      continue;
+      output = currentname.literal + output;
     }
   }
 
