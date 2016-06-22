@@ -56,10 +56,11 @@ var typeLogo = function(callback){
 };
 
 var blinkN = function(time, done){
-  var now = _.now();
+  var start = _.now();
   var is_on = true;
   var blink = function(){
-    if(time <= (_.now() - now)){
+    if(time <= (_.now() - start)){
+      process.stdout.write('\x1b[?25h');
       done();
       return;
     }
@@ -69,7 +70,7 @@ var blinkN = function(time, done){
       process.stdout.write('\x1b[?25h');
     }
     is_on = !is_on;
-    setTimeout(blink, 500);
+    setTimeout(blink, 200);
   };
   blink();
 };
@@ -80,6 +81,22 @@ var newLineTask = function(done){
 };
 
 var type_delay = {min: 10, max: 100};
+
+var promptTask = function(desc){
+  return function(callback){
+    typeIt([
+      '  ' + desc.message
+    ], type_delay, function(){
+      process.stdout.clearLine();
+      process.stdout.cursorTo(0);
+      inquirer['prompt']([_.assign({}, desc, {
+        name: 'val'
+      })]).then(function(resp){
+        callback(undefined, resp.val);
+      });
+    });
+  };
+};
 
 λ.waterfall([
   λ.curry(typeIt, [
@@ -92,7 +109,54 @@ var type_delay = {min: 10, max: 100};
   newLineTask,
   λ.curry(blinkN, 100),
   newLineTask,
-  function(done){
+  promptTask({
+    type: 'confirm',
+    message: 'Would you like me to write you program?'
+  }),
+  function(resp, next){
+    if(resp){
+      typeIt([
+        'Great!'
+      ], type_delay, next);
+    }else{
+      typeIt([
+        'What!',
+        'Excuse me',
+        'I just',
+        'Well, too bad! you',
+        'Well, too bad! I will write you one anyways.',
+      ], type_delay, next);
+    }
+  },
+  newLineTask,
+  newLineTask,
+  promptTask({
+    type: 'input',
+    message: 'Describe the program you would like me to write:'
+  }),
+  function(input, next){
+    next();
+  },
+  λ.curry(typeIt, [
+    'thinking...',
+    'thinking',
+    'thinking...',
+    'thinking',
+    'thinking...',
+    'Hmmm...',
+    'Hmmm',
+    'Hmmm...',
+    'Hmmm',
+    'Hmmm...',
+    'Ok. I do not understand you.'
+  ], type_delay),
+  newLineTask,
+  λ.curry(typeIt, [
+    'So I am just going to write a much better program'
+  ], type_delay),
+  newLineTask,
+  newLineTask,
+  function(next){
     console.log('wat?');
   }
 ]);
