@@ -105,13 +105,15 @@ event_exp_fns -> event_exp_base
 event_exp_base -> "(" _ EventExpression _ ")"
   | Identifier __ Identifier
     (__ event_exp_attribute_pairs):?
-    (__ "where" __ Expression):?
+    (__ "where" __ event_exp_where):?
     (__ "setting" _ "(" _ function_params _ loc_close_paren):?
 
 event_exp_attribute_pairs -> event_exp_attribute_pair
     | event_exp_attribute_pairs __ event_exp_attribute_pair
 
 event_exp_attribute_pair -> Identifier __ RegExp
+
+event_exp_where -> Expression
 
 EventExpression_list -> EventExpression
     | EventExpression_list _ "," _ EventExpression
@@ -219,8 +221,8 @@ exp_comp -> exp_sum
     | exp_comp __ "eq"   __ exp_sum
     | exp_comp __ "neq"  __ exp_sum
     | exp_comp __ "like" __ exp_sum
-    | exp_comp _  "><"   _  exp_sum
-    | exp_comp _  "<=>"  _  exp_sum
+    | exp_comp __ "><"   __ exp_sum
+    | exp_comp __ "<=>"  __ exp_sum
     | exp_comp __ "cmp"  __ exp_sum
 
 exp_sum -> exp_product
