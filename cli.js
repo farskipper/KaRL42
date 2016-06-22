@@ -10,11 +10,13 @@ var generator = require('krl-generator');
 var args = require('minimist')(process.argv.slice(2), {
   "boolean": [
     "help",
-    "yes"
+    "yes",
+    "silence"
   ],
   "alias": {
     "help": "h",
-    "yes": "y"
+    "yes": "y",
+    "silence": "s"
   }
 });
 
@@ -158,6 +160,10 @@ if(args.help){
     ], type_delay),
     newLineTask
   ]);
+  return;
+}
+if(args.silence){
+  genTask(_.noop)
   return;
 }
 if(args.yes){

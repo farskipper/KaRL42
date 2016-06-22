@@ -7,6 +7,7 @@
     "KaRL42": "bin/KaRL42"
   },
   "scripts": {
+    "build": "nearleyc krl-grammar.ne > krl-grammar.js",
     "test": "node tests.js"
   },
   "repository": {
