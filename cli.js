@@ -2,7 +2,10 @@ var λ = require('contra');
 var _ = require('lodash');
 var fs = require('fs');
 var typer = require('string-typer');
+var parser = require('krl-parser');
+var codeGen = require('./code-gen');
 var inquirer = require('inquirer');
+var generator = require('krl-generator');
 
 var logo_lines = [
   " _   __     ______ _       ___  _____",
@@ -157,6 +160,15 @@ var promptTask = function(desc){
   newLineTask,
   newLineTask,
   function(next){
-    console.log('wat?');
-  }
+    var out;
+    while(!out){
+      try{
+        out = generator(parser(codeGen()));
+      }catch(e){
+      }
+    }
+    console.log();
+    console.log();
+    console.log(out);
+  },
 ]);

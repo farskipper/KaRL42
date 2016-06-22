@@ -165,7 +165,7 @@ ruleset -> "ruleset" __ Identifier _ "{" _
 # Rule
 #
 
-rule -> "rule" __ Identifier (__ "is" __ rule_state):? _ "{" _
+rule -> "rule" __ Identifier _ "{" _
   "select" __ "when" __ EventExpression ";"
 
   ("pre" _ declaration_block _ ):?
@@ -174,22 +174,7 @@ rule -> "rule" __ Identifier (__ "is" __ rule_state):? _ "{" _
 
   (RulePostlude _):?
 
-"}" {%
-  function(data, loc){
-    return {
-      loc: {start: loc, end: last(data)},
-      type: 'Rule',
-      name: data[2],
-      rule_state: data[3] ? data[3][3] : "active",
-      select_when: data[7] && data[7][4],
-      prelude: data[8] ? data[8][2] : [],
-      action_block: data[9] && data[9][0],
-      postlude: data[10] && data[10][0]
-    };
-  }
-%}
-
-rule_state -> "active" {% id %} | "inactive" {% id %}
+"}"
 
 ################################################################################
 #
@@ -224,16 +209,6 @@ event_exp_fns -> event_exp_base {% id %}
       {% complexEventOp("count", 2, 6) %}
     | "repeat" __ PositiveInteger _ "(" _ EventExpression _ ")"
       {% complexEventOp("repeat", 2, 6) %}
-    | "and" _ "(" _ EventExpression_list _ ")"
-      {% complexEventOp("and", 4) %}
-    | "or" _ "(" _ EventExpression_list _ ")"
-      {% complexEventOp("or", 4) %}
-    | "before" _ "(" _ EventExpression_list _ ")"
-      {% complexEventOp("before", 4) %}
-    | "then" _ "(" _ EventExpression_list _ ")"
-      {% complexEventOp("then", 4) %}
-    | "after" _ "(" _ EventExpression_list _ ")"
-      {% complexEventOp("after", 4) %}
     | event_exp_fns __  "max" _ "(" _ function_params _ ")"
       {% complexEventOp("max", 0, 6) %}
     | event_exp_fns __  "min" _ "(" _ function_params _ ")"
@@ -245,23 +220,12 @@ event_exp_fns -> event_exp_base {% id %}
     | event_exp_fns __  "push" _ "(" _ function_params _ ")"
       {% complexEventOp("push", 0, 6) %}
 
-event_exp_base -> "(" _ EventExpression _ ")" {% getN(2) %}
-  | Identifier __ Identifier
+event_exp_base ->
+    Identifier __ Identifier
+    __
     event_exp_attribute_pairs
     (__ "where" __ Expression):?
-    (__ "setting" _ "(" _ function_params _ ")"):? {%
-  function(data, start){
-    return {
-      type: 'EventExpression',
-      loc: {start: start, end: lastEndLoc(data)},
-      event_domain: data[0],
-      event_type: data[2],
-      attributes: data[3],
-      where: data[4] && data[4][3],
-      setting: (data[5] && data[5][5]) || []
-    };
-  }
-%}
+    (__ "setting" _ "(" _ function_params _ ")"):?
 
 event_exp_attribute_pairs -> null {% noopArr %}
     | event_exp_attribute_pair {% idArr %}
@@ -386,17 +350,7 @@ ExpressionStatement -> Expression {%
   }
 %}
 
-Declaration -> left_side_of_declaration _ "=" _ Expression {%
-  function(data, start){
-    return {
-      loc: {start: data[0].loc.start, end: data[4].loc.end},
-      type: 'Declaration',
-      op: data[2],
-      left: data[0],
-      right: data[4]
-    };
-  }
-%}
+Declaration -> left_side_of_declaration _ "=" _ Expression
 
 # Later we may add destructuring
 left_side_of_declaration -> Identifier {% id %}
@@ -404,11 +358,10 @@ left_side_of_declaration -> Identifier {% id %}
 Statement_list -> Statement
     | Statement_list _ ";" _ Statement
 
-declaration_block -> "{" _ "}" {% noopArr %}
-    | "{" _ declaration_list _ "}" {% getN(2) %}
+declaration_block -> "{" _ declaration_list _ "}"
 
-declaration_list -> Declaration {% idArr %}
-    | declaration_list __ Declaration {% concatArr(2) %}
+declaration_list -> Declaration
+    | declaration_list __ Declaration
 
 ################################################################################
 #
@@ -467,7 +420,6 @@ MemberExpression -> PrimaryExpression {% id %}
 PrimaryExpression ->
       Identifier {% id %}
     | Literal {% id %}
-    | "(" _ Expression _ ")" {% getN(2) %}
     | Function {% id %}
     | Application {% id %}
 
@@ -568,5 +520,5 @@ PositiveInteger -> "overrided"
 ################################################################################
 # Utils
 
-_  -> " "
+_  -> null
 __ -> " "

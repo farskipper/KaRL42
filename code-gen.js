@@ -52,16 +52,16 @@ module.exports = function(){
 
   while(stack.length > 0){
     count++;
-    if(!stop_recusive_rules && count > 200){
+    if(!stop_recusive_rules && count > 100){
       stop_recusive_rules = true;
     }
     var currentname = stack.pop();
-    if(typeof currentname === 'string'){
+    if(gen[currentname]){
+      stack.push({literal: gen[currentname]()});
+    }else if(typeof currentname === 'string'){
       _.each(selectRule(currentname).symbols, function(symbol){
         stack.push(symbol);
       });
-    }else if(gen[currentname]){
-      stack.push({literal: gen[currentname]()});
     }else if(currentname.test){
       output += new randexp(currentname).gen();
     }else if(currentname.literal){
@@ -71,4 +71,3 @@ module.exports = function(){
 
   return output;
 };
-console.log(module.exports());
