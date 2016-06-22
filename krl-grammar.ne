@@ -104,12 +104,11 @@ event_exp_fns -> event_exp_base
 
 event_exp_base -> "(" _ EventExpression _ ")"
   | Identifier __ Identifier
-    event_exp_attribute_pairs
+    (__ event_exp_attribute_pairs):?
     (__ "where" __ Expression):?
     (__ "setting" _ "(" _ function_params _ loc_close_paren):?
 
-event_exp_attribute_pairs -> null
-    | event_exp_attribute_pair
+event_exp_attribute_pairs -> event_exp_attribute_pair
     | event_exp_attribute_pairs __ event_exp_attribute_pair
 
 event_exp_attribute_pair -> Identifier __ RegExp
