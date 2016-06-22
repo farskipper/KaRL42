@@ -40,7 +40,7 @@ module.exports = function(){
     if(rules.length === 0){
       throw new Error("Nothing matches rule: "+currentname+"!");
     }
-    if(stop_recusive_rules){
+    if(stop_recusive_rules || stack.length > 25){
       rules = _.filter(rules, function(rule){
         return !_.includes(rule.symbols, currentname);
       });

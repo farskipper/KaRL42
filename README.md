@@ -5,7 +5,7 @@ A "friendly" robot that writes KRL code... what could go wrong?
 $ npm i -g karl42
 $ KaRL42
 ```
-KaRL42 will then ask you what kind of program you would like to him write, and where to save it.
+KaRL42 will then ask you what kind of program you would like to him write.
 
 WARNING: KaRL42 obeys orders as he sees fit.
 

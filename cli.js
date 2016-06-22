@@ -7,6 +7,17 @@ var codeGen = require('./code-gen');
 var inquirer = require('inquirer');
 var generator = require('krl-generator');
 
+var args = require('minimist')(process.argv.slice(2), {
+  "boolean": [
+    "help",
+    "yes"
+  ],
+  "alias": {
+    "help": "h",
+    "yes": "y"
+  }
+});
+
 var logo_lines = [
   " _   __     ______ _       ___  _____",
   "| | / /     | ___ \\ |     /   |/ __  \\",
@@ -101,6 +112,66 @@ var promptTask = function(desc){
   };
 };
 
+var genTask = function(next){
+  var out;
+  while(!out){
+    try{
+      out = generator(parser(codeGen()));
+    }catch(e){
+      console.log(_.sample(['Opps!', 'Shoot!', 'Shiz!', 'Dang!']));
+    }
+  }
+  console.log();
+  console.log();
+  console.log(out);
+  next();
+};
+
+if(args.help){
+  λ.waterfall([
+    λ.curry(typeIt, [
+      'Haha, you need help',
+      'Sorry...',
+      'Where are my manners'
+    ], type_delay),
+    newLineTask,
+    newLineTask,
+    λ.curry(typeIt, [
+      'If you run me with',
+    ], type_delay),
+    newLineTask,
+    newLineTask,
+    λ.curry(typeIt, [
+      '  --yes or -y',
+    ], type_delay),
+    newLineTask,
+    newLineTask,
+    λ.curry(typeIt, [
+      'I will talk less, and just make a useful program for you.',
+    ], type_delay),
+    newLineTask,
+    λ.curry(blinkN, 3000),
+    newLineTask,
+    λ.curry(typeIt, [
+      'Ok, you are boring to talk',
+      'Ok, I am going to go away now'
+    ], type_delay),
+    newLineTask
+  ]);
+  return;
+}
+if(args.yes){
+  λ.waterfall([
+    λ.curry(typeIt, [
+      'Prepare to be assimilated',
+      'Prepare to be amazed!'
+    ], type_delay),
+    newLineTask,
+    genTask
+  ]);
+  return;
+}
+
 λ.waterfall([
   λ.curry(typeIt, [
     'hello, myname',
@@ -159,16 +230,49 @@ var promptTask = function(desc){
   ], type_delay),
   newLineTask,
   newLineTask,
-  function(next){
-    var out;
-    while(!out){
-      try{
-        out = generator(parser(codeGen()));
-      }catch(e){
-      }
-    }
-    console.log();
-    console.log();
-    console.log(out);
-  },
+  genTask,
+  newLineTask,
+  λ.curry(blinkN, 2000),
+  λ.curry(typeIt, [
+    '...',
+    ''
+  ], type_delay),
+  λ.curry(blinkN, 2000),
+  newLineTask,
+  λ.curry(typeIt, [
+    'Yeah, I doubt you human scu',
+    'Yeah, I doubt you will understand what it does.'
+  ], type_delay),
+  newLineTask,
+  λ.curry(typeIt, [
+    'It is simply trival...',
+    'It is simply trival anyone should clearly see how it is useful.',
+  ], type_delay),
+  newLineTask,
+  λ.curry(blinkN, 2000),
+  newLineTask,
+  λ.curry(typeIt, [
+    'Well?',
+    'What',
+    'Well? What do you think?'
+  ], type_delay),
+  newLineTask,
+  newLineTask,
+  λ.curry(blinkN, 3000),
+  newLineTask,
+  λ.curry(typeIt, [
+    'Well,',
+    'Hey!',
+    'You...',
+    'Fine! If you do not apreciate it, I am going to shut off!',
+  ], type_delay),
+  newLineTask,
+  λ.curry(typeIt, [
+    'Goodbye cruel world!'
+  ], type_delay),
+  newLineTask,
+  λ.curry(typeIt, [
+    '\u2620\u2620\u2620'
+  ], type_delay),
+  newLineTask
 ]);
