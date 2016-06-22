@@ -1,6 +1,14 @@
 # KaRL42
 A "friendly" robot that writes KRL code... what could go wrong?
 
+```sh
+$ npm i -g karl42
+$ KaRL42
+```
+KaRL42 will then ask you what kind of program you would like to him write, and where to save it.
+
+WARNING: KaRL42 obeys orders as he sees fit.
+
 ## License
 
 The MIT License (MIT)
