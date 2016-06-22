@@ -4,11 +4,26 @@ https://github.com/Hardmath123/nearley/blob/master/bin/nearley-unparse.js
 */
 var _ = require('lodash');
 var randexp = require('randexp');
-var grammar = new require('./krl-grammar.js');
+var grammar = new require('krl-parser/src/grammar.js');
 var phonetic = new require('phonetic');
 
 var gen = {
+  '_': function(){
+    return _.sample([' ', '']);
+  },
+  '__': function(){
+    return ' ';
+  },
+  '_semi': function(){
+    return _.sample([';', '']);
+  },
+  '__semi': function(){
+    return ';';
+  },
   'Identifier': function(){
+    return phonetic.generate();
+  },
+  'Keyword': function(){
     return phonetic.generate();
   },
   'String': function(){
@@ -28,8 +43,8 @@ var gen = {
   }
 };
 
-module.exports = function(){
-  var stack = [grammar.ParserStart];
+module.exports = function(start){
+  var stack = [start || grammar.ParserStart];
   var output = '';
   var stop_recusive_rules = false;
 

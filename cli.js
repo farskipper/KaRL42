@@ -118,9 +118,10 @@ var genTask = function(next){
   var out;
   while(!out){
     try{
-      out = generator(parser(codeGen()));
+      out = generator(parser(codeGen("ruleset")));
     }catch(e){
-      console.log(_.sample(['Opps!', 'Shoot!', 'Shiz!', 'Dang!']));
+      console.log(e + '');
+      console.log(_.sample(['Opps!', 'crap!', 'hmmm...', 'what the?!?', 'Dang it!']));
     }
   }
   console.log();
