@@ -82,14 +82,23 @@ event_exp_infix_op -> event_exp_fns
 
 event_exp_fns -> event_exp_base
     | event_exp_fns __ "between" _ "(" _ EventExpression _ "," _ EventExpression _ loc_close_paren
+
     | event_exp_fns __ "not" __ "between" _ "(" _ EventExpression _ "," _ EventExpression _ loc_close_paren
+
     | "any" __ PositiveInteger _ "(" _ EventExpression_list _ loc_close_paren
+
     | "count" __ PositiveInteger _ "(" _ EventExpression _ loc_close_paren
+
     | "repeat" __ PositiveInteger _ "(" _ EventExpression _ loc_close_paren
+
     | event_exp_fns __  "max" _ "(" _ function_params _ loc_close_paren
+
     | event_exp_fns __  "min" _ "(" _ function_params _ loc_close_paren
+
     | event_exp_fns __  "sum" _ "(" _ function_params _ loc_close_paren
+
     | event_exp_fns __  "avg" _ "(" _ function_params _ loc_close_paren
+
     | event_exp_fns __  "push" _ "(" _ function_params _ loc_close_paren
 
 
