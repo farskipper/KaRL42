@@ -215,7 +215,6 @@ var grammar = {
     {"name": "Literal", "symbols": ["Chevron"]},
     {"name": "Literal", "symbols": ["Array"]},
     {"name": "Literal", "symbols": ["Map"]},
-    {"name": "Expression_list", "symbols": []},
     {"name": "Expression_list", "symbols": ["Expression"]},
     {"name": "Expression_list", "symbols": ["Expression_list", "_", {"literal":","}, "_", "Expression"]},
     {"name": "Function$string$1", "symbols": [{"literal":"f"}, {"literal":"u"}, {"literal":"n"}, {"literal":"c"}, {"literal":"t"}, {"literal":"i"}, {"literal":"o"}, {"literal":"n"}], "postprocess": function joiner(d) {return d.join('');}},

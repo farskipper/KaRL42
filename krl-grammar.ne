@@ -209,8 +209,7 @@ Literal ->
     | Array
     | Map
 
-Expression_list -> null
-    | Expression
+Expression_list -> Expression
     | Expression_list _ "," _ Expression
 
 ################################################################################
