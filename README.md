@@ -9,6 +9,13 @@ KaRL42 will then ask you what kind of program you would like to him write.
 
 WARNING: KaRL42 obeys orders as he sees fit.
 
+## API
+```js
+var KaRL42 = require('karl42');
+
+var src = KaRL42();
+```
+
 ## License
 
 The MIT License (MIT)

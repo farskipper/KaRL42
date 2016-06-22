@@ -3,7 +3,7 @@ var _ = require('lodash');
 var fs = require('fs');
 var typer = require('string-typer');
 var parser = require('krl-parser');
-var codeGen = require('./code-gen');
+var codeGen = require('./');
 var inquirer = require('inquirer');
 var generator = require('krl-generator');
 
