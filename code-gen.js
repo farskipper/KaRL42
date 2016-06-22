@@ -52,7 +52,7 @@ module.exports = function(){
 
   while(stack.length > 0){
     count++;
-    if(!stop_recusive_rules && count > 100){
+    if(!stop_recusive_rules && count > 500){
       stop_recusive_rules = true;
     }
     var currentname = stack.pop();
