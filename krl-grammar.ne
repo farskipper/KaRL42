@@ -147,63 +147,18 @@ var MemberExpression_method = function(method){
 
 %}
 
-main -> _ ruleset_list _ {% getN(1) %}
-    | _ Statement_list _ {% getN(1) %}
+main -> ruleset
 
 ################################################################################
 #
 # Ruleset
 #
 
-ruleset_list -> ruleset {% idArr %}
-    | ruleset_list _ ";" _ ruleset {% concatArr(4) %}
-
 ruleset -> "ruleset" __ Identifier _ "{" _
-  ("meta" _ ruleset_meta_block _):?
+  "meta{author \"KaRL42\"}" _
   ("global" _ declaration_block _):?
-  (rule _):*
-loc_close_curly {%
-  function(data, loc){
-    return {
-      loc: {start: loc, end: last(data)},
-      type: 'Ruleset',
-      name: data[2],
-      meta: data[6] ? data[6][2] : [],
-      global: data[7] ? data[7][2] : [],
-      rules: data[8].map(function(pair){
-        return pair[0];
-      })
-    };
-  }
-%}
-
-ruleset_meta_block -> "{" _ "}" {% noopArr %}
-    | "{" _ ruleset_meta_prop_list _ "}" {% getN(2) %}
-
-ruleset_meta_prop_list -> ruleset_meta_prop {% idArr %}
-    | ruleset_meta_prop_list __ ruleset_meta_prop {% concatArr(2) %}
-
-ruleset_meta_prop -> Keyword __ Expression {%
-  function(data, start){
-    return {
-      loc: {start: start, end: data[2].loc.end},
-      type: 'RulesetMetaProperty',
-      key: data[0],
-      value: data[2]
-    };
-  }
-%}
-
-Keyword -> [a-zA-Z_$] [a-zA-Z0-9_$]:* {%
-  function(data, loc, reject){
-    var src = flatten(data).join('');
-    return {
-      loc: {start: loc, end: loc + src.length},
-      type: 'Keyword',
-      value: src
-    };
-  }
-%}
+  (rule _):+
+"}"
 
 ################################################################################
 #
@@ -211,7 +166,7 @@ Keyword -> [a-zA-Z_$] [a-zA-Z0-9_$]:* {%
 #
 
 rule -> "rule" __ Identifier (__ "is" __ rule_state):? _ "{" _
-  ("select" __ "when" __ EventExpression _semi):?
+  "select" __ "when" __ EventExpression ";"
 
   ("pre" _ declaration_block _ ):?
 
@@ -219,7 +174,7 @@ rule -> "rule" __ Identifier (__ "is" __ rule_state):? _ "{" _
 
   (RulePostlude _):?
 
-loc_close_curly {%
+"}" {%
   function(data, loc){
     return {
       loc: {start: loc, end: last(data)},
@@ -259,42 +214,42 @@ event_exp_infix_op -> event_exp_fns {% id %}
     | event_exp_infix_op __ "after"  __ event_exp_fns {% infixEventOp %}
 
 event_exp_fns -> event_exp_base {% id %}
-    | event_exp_fns __ "between" _ "(" _ EventExpression _ "," _ EventExpression _ loc_close_paren
+    | event_exp_fns __ "between" _ "(" _ EventExpression _ "," _ EventExpression _ ")"
       {% complexEventOp("between", 0, 6, 10) %}
-    | event_exp_fns __ "not" __ "between" _ "(" _ EventExpression _ "," _ EventExpression _ loc_close_paren
+    | event_exp_fns __ "not" __ "between" _ "(" _ EventExpression _ "," _ EventExpression _ ")"
       {% complexEventOp("not between", 0, 8, 12) %}
-    | "any" __ PositiveInteger _ "(" _ EventExpression_list _ loc_close_paren
+    | "any" __ PositiveInteger _ "(" _ EventExpression_list _ ")"
       {% complexEventOp("any", 2, 6) %}
-    | "count" __ PositiveInteger _ "(" _ EventExpression _ loc_close_paren
+    | "count" __ PositiveInteger _ "(" _ EventExpression _ ")"
       {% complexEventOp("count", 2, 6) %}
-    | "repeat" __ PositiveInteger _ "(" _ EventExpression _ loc_close_paren
+    | "repeat" __ PositiveInteger _ "(" _ EventExpression _ ")"
       {% complexEventOp("repeat", 2, 6) %}
-    | "and" _ "(" _ EventExpression_list _ loc_close_paren
+    | "and" _ "(" _ EventExpression_list _ ")"
       {% complexEventOp("and", 4) %}
-    | "or" _ "(" _ EventExpression_list _ loc_close_paren
+    | "or" _ "(" _ EventExpression_list _ ")"
       {% complexEventOp("or", 4) %}
-    | "before" _ "(" _ EventExpression_list _ loc_close_paren
+    | "before" _ "(" _ EventExpression_list _ ")"
       {% complexEventOp("before", 4) %}
-    | "then" _ "(" _ EventExpression_list _ loc_close_paren
+    | "then" _ "(" _ EventExpression_list _ ")"
       {% complexEventOp("then", 4) %}
-    | "after" _ "(" _ EventExpression_list _ loc_close_paren
+    | "after" _ "(" _ EventExpression_list _ ")"
       {% complexEventOp("after", 4) %}
-    | event_exp_fns __  "max" _ "(" _ function_params _ loc_close_paren
+    | event_exp_fns __  "max" _ "(" _ function_params _ ")"
       {% complexEventOp("max", 0, 6) %}
-    | event_exp_fns __  "min" _ "(" _ function_params _ loc_close_paren
+    | event_exp_fns __  "min" _ "(" _ function_params _ ")"
       {% complexEventOp("min", 0, 6) %}
-    | event_exp_fns __  "sum" _ "(" _ function_params _ loc_close_paren
+    | event_exp_fns __  "sum" _ "(" _ function_params _ ")"
       {% complexEventOp("sum", 0, 6) %}
-    | event_exp_fns __  "avg" _ "(" _ function_params _ loc_close_paren
+    | event_exp_fns __  "avg" _ "(" _ function_params _ ")"
       {% complexEventOp("avg", 0, 6) %}
-    | event_exp_fns __  "push" _ "(" _ function_params _ loc_close_paren
+    | event_exp_fns __  "push" _ "(" _ function_params _ ")"
       {% complexEventOp("push", 0, 6) %}
 
 event_exp_base -> "(" _ EventExpression _ ")" {% getN(2) %}
   | Identifier __ Identifier
     event_exp_attribute_pairs
     (__ "where" __ Expression):?
-    (__ "setting" _ "(" _ function_params _ loc_close_paren):? {%
+    (__ "setting" _ "(" _ function_params _ ")"):? {%
   function(data, start){
     return {
       type: 'EventExpression',
@@ -379,7 +334,7 @@ RuleActions -> RuleAction {% idArr %}
 
 RuleAction ->
     (Identifier _ "=>" _):?
-    Identifier _ "(" _ Expression_list _ loc_close_paren
+    Identifier _ "(" _ Expression_list _ ")"
     (_ "with" __ declaration_list):? {%
   function(data, start){
     return {
@@ -405,7 +360,7 @@ RulePostlude ->
       (_ "finally" _ postlude_clause):?
       {% RulePostlude_by_paths([2, 0], [3, 3, 0], [4, 3, 0]) %}
 
-postlude_clause -> "{" _ Statement_list _ loc_close_curly {%
+postlude_clause -> "{" _ Statement_list _ "}" {%
   function(d){
     //we need to keep the location of the close curly
     return [d[2],d[4]];
@@ -506,12 +461,9 @@ exp_product -> MemberExpression {% id %}
     | exp_product _ "%" _ MemberExpression {% infixOp %}
 
 MemberExpression -> PrimaryExpression {% id %}
-    | MemberExpression _ "[" _ Expression _ loc_close_square
-      {% MemberExpression_method('index') %}
-    | MemberExpression _ "{" _ Expression _ loc_close_curly
-      {% MemberExpression_method('path') %}
+    | MemberExpression _ "[" _ Expression _ "]"
+    | MemberExpression _ "{" _ Expression _ "}"
     | MemberExpression _ "." _ Identifier
-      {% MemberExpression_method('dot') %}
 
 PrimaryExpression ->
       Identifier {% id %}
@@ -536,7 +488,7 @@ Expression_list -> null {% noopArr %}
 ################################################################################
 # Functions
 
-Function -> "function" _ "(" _ function_params _ ")" _ "{" _ Statement_list _ loc_close_curly {%
+Function -> "function" _ "(" _ function_params _ ")" _ "{" _ Statement_list _ "}" {%
   function(data, start){
     return {
       loc: {start: start, end: last(data)},
@@ -552,7 +504,7 @@ function_params ->
     | Identifier {% idArr %}
     | function_params _ "," _ Identifier {% concatArr(4) %}
 
-Application -> MemberExpression _ "(" _ Expression_list _ loc_close_paren {%
+Application -> MemberExpression _ "(" _ Expression_list _ ")" {%
   function(data, start){
     return {
       loc: {start: start, end: last(data)},
@@ -566,7 +518,7 @@ Application -> MemberExpression _ "(" _ Expression_list _ loc_close_paren {%
 ################################################################################
 # Literal Datastructures
 
-Array -> "[" _ Expression_list _ loc_close_square {%
+Array -> "[" _ Expression_list _ "]" {%
   function(data, loc){
     return {
       type: 'Array',
@@ -576,7 +528,7 @@ Array -> "[" _ Expression_list _ loc_close_square {%
   }
 %}
 
-Map -> "{" _ map_kv_pairs _ loc_close_curly {%
+Map -> "{" _ map_kv_pairs _ "}" {%
   function(data, loc){
     return {
       loc: {start: loc, end: last(data)},
@@ -604,157 +556,18 @@ map_kv_pair -> String _ ":" _ Expression {%
 ################################################################################
 # Literals
 
-Identifier -> [a-zA-Z_$] [a-zA-Z0-9_$]:* {%
-  function(data, loc, reject){
-    var src = flatten(data).join('');
-    if(reserved_identifiers.hasOwnProperty(src)){
-      return reject;
-    }
-    return {
-      type: 'Identifier',
-      loc: {start: loc, end: loc + src.length},
-      value: src
-    };
-  }
-%}
+Boolean -> "true"
+         | "false"
 
-Boolean -> "true"  {% booleanAST(true ) %}
-         | "false" {% booleanAST(false) %}
-
-PositiveInteger -> [0-9]:+ {%
-  function(data, loc){
-    var src = flatten(data).join('');
-    return {
-      loc: {start: loc, end: loc + src.length},
-      type: 'Number',
-      value: parseInt(src, 10) || 0// or 0 to avoid NaN
-    };
-  }
-%}
-
-Number -> number {%
-  function(data, loc){
-    var src = flatten(data).join('');
-    return {
-      loc: {start: loc, end: loc + src.length},
-      type: 'Number',
-      value: parseFloat(src) || 0// or 0 to avoid NaN
-    };
-  }
-%}
-
-number ->
-    float
-    | "+" float
-    | "-" float
-
-float ->
-    int
-    | "." int
-    | int "." int
-
-int -> [0-9]:+ {% idAll %}
-
-RegExp -> "re#" regexp_pattern "#" regexp_modifiers {%
-  function(data, loc){
-    var pattern = data[1];
-    var modifiers = data[3][0];
-    return {
-      loc: {start: loc, end: data[3][1]},
-      type: 'RegExp',
-      value: new RegExp(pattern, modifiers)
-    };
-  }
-%}
-
-regexp_pattern ->
-    null {% noopStr %}
-    | regexp_pattern regexp_pattern_char {% function(d){return d[0] + d[1]} %}
-
-regexp_pattern_char ->
-  [^\\#] {% id %}
-  | "\\" [^] {% function(d){return d[1] === '#' ? '#' : '\\\\'} %}
-
-regexp_modifiers -> regexp_modifiers_chars {%
-  function(data, loc){
-    var src = flatten(data).join('');
-    return [src, loc + src.length];
-  }
-%}
-
-regexp_modifiers_chars -> null {% noopStr %}
-    | "i" | "g" | "ig" | "gi"
-
-Chevron -> "<<" chevron_body loc_close_chevron {%
-  function(data, loc){
-    return {
-      loc: {start: loc - 2, end: last(data)},
-      type: 'Chevron',
-      value: data[1]
-    };
-  }
-%}
-
-chevron_body ->
-    chevron_string_node {% idArr %}
-    | chevron_body beesting chevron_string_node {% function(d){return d[0].concat([d[1], d[2]])} %}
-
-beesting -> "#{" _ Expression _ "}" {% getN(2) %}
-
-chevron_string_node -> chevron_string {%
-  function(data, loc){
-    var src = data[0];
-    return {
-      loc: {start: loc, end: loc + src.length},
-      type: 'String',
-      value: src.replace(/>\\>/g, '>>')
-    };
-  }
-%}
-
-chevron_string ->
-    null {% noopStr %}
-    | chevron_string chevron_char {% function(d){return d[0] + d[1]} %}
-
-chevron_char ->
-    [^>#] {% id %}
-    | "#" [^{] {% idAll %}
-    | ">" [^>] {% idAll %}
-
-String -> "\"" string "\"" {%
-  function(data, loc){
-    var src = data[1];
-    return {
-      loc: {start: loc, end: loc + src.length + 2},
-      type: 'String',
-      value: src
-    };
-  }
-%}
-
-string -> null {% noopStr %}
-    | string stringchar {% function(d){return d[0] + d[1]} %}
-
-stringchar ->
-      [^\\"] {% id %}
-    | "\\" [^] {% function(d){return JSON.parse('"' + d[0] + d[1] + '"')} %}
+Identifier -> "overrided"
+String -> "overrided"
+Chevron -> "overrided"
+RegExp -> "overrided"
+Number -> "overrided"
+PositiveInteger -> "overrided"
 
 ################################################################################
 # Utils
 
-# Chars that return their end location
-loc_close_curly -> "}" {% idEndLoc %}
-loc_close_square -> "]" {% idEndLoc %}
-loc_close_paren -> ")" {% idEndLoc %}
-loc_close_chevron -> ">>" {% idEndLoc %}
-
-# Whitespace and Semi-colons
-_  -> [\s]:* {% noop %}
-__ -> [\s]:+ {% noop %}
-
-##optional space and/or semi-colon
-_semi -> [\s;]:* {% noop %}
-
-##required space and/or semi-colon
-__semi -> [\s;]:+ {% noop %}
-#if you must have semi-colon, use ";" directly
+_  -> " "
+__ -> " "
