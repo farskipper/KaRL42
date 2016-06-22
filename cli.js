@@ -119,14 +119,20 @@ var genTask = function(next){
   while(!out){
     try{
       out = generator(parser(codeGen("ruleset")));
+      if(out.length < 200){
+        out = undefined;
+        console.log(_.sample(['Opps!', 'hmmm...', 'what the?!?', 'You are going to like this.']));
+      }
     }catch(e){
       console.log(e + '');
-      console.log(_.sample(['Opps!', 'crap!', 'hmmm...', 'what the?!?', 'Dang it!']));
+      console.log(_.sample(['Opps!', 'crap!', 'Dang it!']));
     }
   }
   console.log();
   console.log();
   console.log(out);
+  console.log();
+  console.log();
   next();
 };
 
@@ -164,7 +170,7 @@ if(args.help){
   return;
 }
 if(args.silence){
-  genTask(_.noop)
+  genTask(_.noop);
   return;
 }
 if(args.yes){
