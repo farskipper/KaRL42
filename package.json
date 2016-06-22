@@ -1,6 +1,6 @@
 {
   "name": "karl42",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A \"friendly\" robot that writes KRL code... what could go wrong?",
   "main": "index.js",
   "bin": {
