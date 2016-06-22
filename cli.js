@@ -6,17 +6,20 @@ var parser = require('krl-parser');
 var codeGen = require('./');
 var inquirer = require('inquirer');
 var generator = require('krl-generator');
+var my_version = require('./package.json').version;
 
 var args = require('minimist')(process.argv.slice(2), {
   "boolean": [
     "help",
     "yes",
-    "silence"
+    "silence",
+    "version"
   ],
   "alias": {
     "help": "h",
     "yes": "y",
-    "silence": "s"
+    "silence": "s",
+    "version": "v"
   }
 });
 
@@ -136,6 +139,10 @@ var genTask = function(next){
   next();
 };
 
+if(args.version){
+  console.log(my_version);
+  return;
+}
 if(args.help){
   λ.waterfall([
     λ.curry(typeIt, [
@@ -157,6 +164,16 @@ if(args.help){
     newLineTask,
     λ.curry(typeIt, [
       'I will talk less, and just make a useful program for you.',
+    ], type_delay),
+    newLineTask,
+    newLineTask,
+    λ.curry(typeIt, [
+      '  --silence or -s',
+    ], type_delay),
+    newLineTask,
+    newLineTask,
+    λ.curry(typeIt, [
+      'I will try to remain silent until the program is produced',
     ], type_delay),
     newLineTask,
     λ.curry(blinkN, 3000),

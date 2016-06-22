@@ -4,7 +4,8 @@
   "description": "A \"friendly\" robot that writes KRL code... what could go wrong?",
   "main": "index.js",
   "bin": {
-    "KaRL42": "bin/KaRL42"
+    "KaRL42": "bin/KaRL42",
+    "karl42": "bin/KaRL42"
   },
   "scripts": {
     "build": "nearleyc krl-grammar.ne > krl-grammar.js",
