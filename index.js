@@ -4,8 +4,8 @@ https://github.com/Hardmath123/nearley/blob/master/bin/nearley-unparse.js
 */
 var _ = require('lodash');
 var randexp = require('randexp');
-var grammar = new require('krl-parser/src/grammar.js');
 var phonetic = new require('phonetic');
+var default_grammar = new require('krl-parser/src/grammar.js');
 
 var gen = {
   '_': function(){
@@ -63,8 +63,13 @@ var isParenRule = function(rule){
   return true;
 };
 
-module.exports = function(start){
-  var stack = [start || grammar.ParserStart];
+module.exports = function(options){
+  options = options || {};
+
+  var grammar = options.grammar || default_grammar;
+  var start = options.start || grammar.ParserStart;
+
+  var stack = [start];
   var output = '';
   var stop_recusive_rules = false;
 

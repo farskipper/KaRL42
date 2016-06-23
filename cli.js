@@ -121,7 +121,9 @@ var genTask = function(next){
   var out;
   while(!out){
     try{
-      out = generator(parser(codeGen("ruleset")));
+      out = generator(parser(codeGen({
+        start: "ruleset"
+      })));
       if(out.length < 200){
         out = undefined;
         console.log(_.sample(['Opps!', 'hmmm...', 'what the?!?', 'You are going to like this.']));

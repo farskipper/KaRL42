@@ -16,6 +16,10 @@ var KaRL42 = require('karl42');
 var src = KaRL42();
 ```
 
+### src = KaRL42(options)
+ * `options.grammar` which the nearley grammar to use. (default `new require('krl-parser/src/grammar.js')`)
+ * `options.start` which rule name to start with. (default grammar.ParserStart)
+
 ## License
 
 The MIT License (MIT)

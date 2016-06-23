@@ -8,7 +8,6 @@
     "karl42": "bin/KaRL42"
   },
   "scripts": {
-    "build": "nearleyc krl-grammar.ne > krl-grammar.js",
     "test": "node tests.js"
   },
   "repository": {
@@ -34,6 +33,7 @@
     "lodash": "^4.13.1",
     "minimist": "^1.2.0",
     "phonetic": "^0.1.1",
+    "randexp": "^0.4.2",
     "string-typer": "^1.2.0"
   }
 }
