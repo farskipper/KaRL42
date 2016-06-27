@@ -28,8 +28,8 @@
   "dependencies": {
     "contra": "^1.9.4",
     "inquirer": "^1.0.3",
-    "krl-generator": "^0.1.0",
-    "krl-parser": "^0.5.0",
+    "krl-generator": "^0.2.0",
+    "krl-parser": "^0.7.0",
     "lodash": "^4.13.1",
     "minimist": "^1.2.0",
     "phonetic": "^0.1.1",
