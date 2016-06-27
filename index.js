@@ -106,7 +106,7 @@ module.exports = function(options){
         stack.push(symbol);
       });
     }else if(currentname.test){
-      output += new randexp(currentname).gen();
+      output = new randexp(currentname).gen() + output;
     }else if(currentname.literal){
       output = currentname.literal + output;
     }

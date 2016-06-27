@@ -122,7 +122,7 @@ var genTask = function(next){
   while(!out){
     try{
       out = generator(parser(codeGen({
-        start: "ruleset"
+        start: "Ruleset"
       })));
       if(out.length < 200){
         out = undefined;
