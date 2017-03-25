@@ -8,17 +8,11 @@ var phonetic = new require('phonetic');
 var default_grammar = new require('krl-parser/src/grammar.js');
 
 var gen = {
-  '_': function(){
-    return _.sample([' ', '']);
+  "Function": function(){
+    return "function(){}";
   },
-  '__': function(){
-    return ' ';
-  },
-  '_semi': function(){
-    return _.sample([';', '']);
-  },
-  '__semi': function(){
-    return ';';
+  "RulesetID": function(){
+    return "karl42.picolabs.io";
   },
   'Identifier': function(){
     return phonetic.generate();
@@ -44,20 +38,17 @@ var gen = {
 };
 
 var isParenRule = function(rule){
-  if(_.size(rule && rule.symbols) !== 5){
+  if(_.size(rule && rule.symbols) !== 3){
     return false;
   }
   var s = rule.symbols;
-  if(!s[0] || s[0].literal !== "("){
+  if(!s[0] || s[0].unparse_hint_value !== "("){
     return false;
   }
-  if(s[1] !== "_"){
+  if(s[1] !== "Expression"){
     return false;
   }
-  if(s[3] !== "_"){
-    return false;
-  }
-  if(!s[4] || s[4].literal !== ")"){
+  if(!s[2] || s[2].unparse_hint_value !== ")"){
     return false;
   }
   return true;
@@ -99,16 +90,29 @@ module.exports = function(options){
       stop_recusive_rules = true;
     }
     var currentname = stack.pop();
+    if(/^With_/.test(currentname)){
+      currentname = "With_and_body";
+    }
+    if(currentname === "left_side_of_declaration"){
+      currentname = "Identifier";
+    }
     if(gen[currentname]){
       stack.push({literal: gen[currentname]()});
     }else if(typeof currentname === 'string'){
       _.each(selectRule(currentname).symbols, function(symbol){
         stack.push(symbol);
       });
-    }else if(currentname.test){
-      output = new randexp(currentname).gen() + output;
+
+    }else if(currentname.unparse_hint_value){
+      output = " " + currentname.unparse_hint_value + " " + output;
+    }else if(_.has(currentname, "unparse_hint_enum")){
+      output = " " + _.sample(currentname.unparse_hint_enum) + " " + output;
+    }else if(currentname.unparse_hint_type === "SYMBOL"){
+      output = " " + phonetic.generate() + " " + output;
     }else if(currentname.literal){
-      output = currentname.literal + output;
+      output = currentname.literal + " " + output;
+    }else{
+      throw new Error("Unsupported: " + JSON.stringify(currentname));
     }
   }
 
