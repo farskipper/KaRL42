@@ -2,39 +2,41 @@
 Thanks nearley-unparse
 https://github.com/Hardmath123/nearley/blob/master/bin/nearley-unparse.js
 */
-var _ = require('lodash');
-var randexp = require('randexp');
-var phonetic = new require('phonetic');
-var default_grammar = new require('krl-parser/src/grammar.js');
+var _ = require("lodash");
+var randexp = require("randexp");
+var phonetic = new require("phonetic");
+var default_grammar = new require("krl-parser/src/grammar.js");
 
 var gen = {
-  "Function": function(){
-    return "function(){}";
-  },
   "RulesetID": function(){
     return "karl42.picolabs.io";
   },
-  'Identifier': function(){
+  "Identifier": function(){
     return phonetic.generate();
   },
-  'Keyword': function(){
+  "Keyword": function(){
     return phonetic.generate();
   },
-  'String': function(){
+  "String": function(){
     return JSON.stringify(phonetic.generate());
   },
-  'Chevron': function(){
-    return '<<blah>>';
+  "Chevron": function(){
+    return "<<blah>>";
   },
-  'RegExp': function(){
-    return 're#(.*)#';
+  "RegExp": function(){
+    return "re#(.*)#";
   },
-  'Number': function(){
-    return _.random(-100, 100, true) + '';
+  "Number": function(){
+    return _.random(-100, 100, true) + "";
   },
-  'PositiveInteger': function(){
-    return _.random(0, 100) + '';
-  }
+  "PositiveInteger": function(){
+    return _.random(0, 100) + "";
+  },
+
+
+  "Expression": function(){//TODO remove
+    return "\"expression\"";//TODO remove
+  },//TODO remove
 };
 
 var isParenRule = function(rule){
@@ -61,7 +63,7 @@ module.exports = function(options){
   var start = options.start || grammar.ParserStart;
 
   var stack = [start];
-  var output = '';
+  var output = "";
   var stop_recusive_rules = false;
 
   var selectRule = function(currentname){
@@ -98,7 +100,7 @@ module.exports = function(options){
     }
     if(gen[currentname]){
       stack.push({literal: gen[currentname]()});
-    }else if(typeof currentname === 'string'){
+    }else if(typeof currentname === "string"){
       _.each(selectRule(currentname).symbols, function(symbol){
         stack.push(symbol);
       });
